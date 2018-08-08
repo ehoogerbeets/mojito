@@ -145,4 +145,20 @@ public class HtmlTagIntegrityCheckerTest {
         checker.check(source, target);
     }
 
+    @Test(expected = HtmlTagIntegrityCheckerException.class)
+    public void testHtmlTagCheckCloseTagsSame() {
+        String source = "<div id=\"asdf\">There are <span class=\"foo\">%1</span> files and %2 folders</div>";
+        String target = "<div id=\"asdf\">Il y a <span class=\"foo\">%1</Span> fichiers et %2 dossiers</Div>";
+
+        checker.check(source, target);
+    }
+
+    @Test
+    public void testHtmlTagCheckNonTagLessThanDoesntConfuseThings() {
+        String source = "Upload is <10% complete.";
+        String target = "Le téléchargement est terminé < 10 %.";
+
+        checker.check(source, target);
+    }
+
 }
