@@ -23,7 +23,7 @@ public class HtmlTagIntegrityChecker extends RegexIntegrityChecker {
     @Override
     public String getRegex() {
         // return "</?[b|i|u]>";
-        return "(<\\w+(\\s+\\w+(\\s*=\\s*('(\\\'|[^'])*'|\"(\\\"|[^\"])*\")))*>|</\\w+>)";
+        return "(<\\w+(\\s+\\w+(\\s*=\\s*('(\\\'|[^'])*?'|\"(\\\"|[^\"])*?\")))*?>|</\\w+>)";
     }
     
     @Override
