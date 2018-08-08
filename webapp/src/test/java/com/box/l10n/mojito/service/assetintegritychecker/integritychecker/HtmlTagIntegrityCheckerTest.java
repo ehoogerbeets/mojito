@@ -97,10 +97,50 @@ public class HtmlTagIntegrityCheckerTest {
         checker.check(source, target);
     }
 
+    @Test(expected = HtmlTagIntegrityCheckerException.class)
+    public void testHtmlTagCheckMissingAttributes() {
+        String source = "<div id=\"asdf\">There are <span class=\"foo\">%1</span> files and %2 folders</div>";
+        String target = "<div>Il y a <span class=\"foo\">%1</span> fichiers et %2 dossiers</div>";
+
+        checker.check(source, target);
+    }
+
     @Test
     public void testHtmlTagCheckWorksForNoTags() throws Exception {
         String source = "There are %1 files and %2 folders";
         String target = "Il y a %1 fichiers et %2 dossiers";
+
+        checker.check(source, target);
+    }
+
+    @Test
+    public void testHtmlTagCheckWorksForNoValueAttributes() {
+        String source = "<option selected>There are <span class=\"foo\">%1</span> files and %2 folders</option>";
+        String target = "<option selected>Il y a <span class=\"foo\">%1</span> fichiers et %2 dossiers</option>";
+
+        checker.check(source, target);
+    }
+
+    @Test(expected = HtmlTagIntegrityCheckerException.class)
+    public void testHtmlTagCheckIncorrectTagNameCase() {
+        String source = "<span class=\"asdf\">There are <span class=\"foo\">%1</span> files and %2 folders</option>";
+        String target = "<Span class=\"asdf\">Il y a <span class=\"foo\">%1</span> fichiers et %2 dossiers</option>";
+
+        checker.check(source, target);
+    }
+
+    @Test
+    public void testHtmlTagCheckWhiteSpaceInAttributes() {
+        String source = "<div id = \"asdf\">There are <span class = \"foo\">%1</span> files and %2 folders</div>";
+        String target = "<div id = \"asdf\">Il y a <span class = \"foo\">%1</span> fichiers et %2 dossiers</div>";
+
+        checker.check(source, target);
+    }
+
+    @Test(expected = HtmlTagIntegrityCheckerException.class)
+    public void testHtmlTagCheckWhiteSpaceIsSame() {
+        String source = "<div id=\"asdf\">There are <span class=\"foo\">%1</span> files and %2 folders</div>";
+        String target = "<div id = \"asdf\">Il y a <span class = \"foo\">%1</span> fichiers et %2 dossiers</div>";
 
         checker.check(source, target);
     }
