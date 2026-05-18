@@ -50,6 +50,12 @@ public class LocalizedAssetBody {
 
   Status status = Status.ALL;
 
+  /**
+   * When true and used with pseudo localization, accent substitutions are deterministic for the
+   * same input instead of random.
+   */
+  Boolean fixedPseudo;
+
   public LocalizedAssetBody() {}
 
   public LocalizedAssetBody(String bcp47Tag, String content) {
@@ -135,5 +141,13 @@ public class LocalizedAssetBody {
 
   public void setPullRunName(String pullRunName) {
     this.pullRunName = pullRunName;
+  }
+
+  public Boolean getFixedPseudo() {
+    return fixedPseudo;
+  }
+
+  public void setFixedPseudo(Boolean fixedPseudo) {
+    this.fixedPseudo = fixedPseudo;
   }
 }

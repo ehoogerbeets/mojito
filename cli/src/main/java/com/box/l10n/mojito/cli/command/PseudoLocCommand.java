@@ -86,6 +86,14 @@ public class PseudoLocCommand extends Command {
   String sourcePathFilterRegex;
 
   @Parameter(
+      names = {"--fixed"},
+      arity = 0,
+      description =
+          "Deterministic pseudo localization: the same source text maps to the same accented"
+              + " characters on every run (default uses random accents)")
+  boolean fixedPseudo = false;
+
+  @Parameter(
       names = {Param.DIR_PATH_INCLUDE_PATTERNS_LONG},
       variableArity = true,
       required = false,
@@ -192,7 +200,8 @@ public class PseudoLocCommand extends Command {
               assetByPathAndRepositoryId.getId(),
               assetContent,
               sourceFileMatch.getFileType().getFilterConfigIdOverride(),
-              filterOptions);
+              filterOptions,
+              fixedPseudo);
 
       logger.trace("PseudoLocalizedAsset content = {}", pseudoLocalizedAsset.getContent());
       return pseudoLocalizedAsset;

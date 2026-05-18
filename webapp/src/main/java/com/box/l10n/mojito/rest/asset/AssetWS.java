@@ -306,9 +306,14 @@ public class AssetWS {
     Asset asset = assetRepository.getOne(assetId);
     String normalizedContent = NormalizationUtils.normalize(localizedAssetBody.getContent());
 
+    boolean fixedPseudo = Boolean.TRUE.equals(localizedAssetBody.getFixedPseudo());
+
     String generateLocalized =
         tmService.generatePseudoLocalized(
-            asset, normalizedContent, localizedAssetBody.getFilterConfigIdOverride());
+            asset,
+            normalizedContent,
+            localizedAssetBody.getFilterConfigIdOverride(),
+            fixedPseudo);
 
     localizedAssetBody.setContent(generateLocalized);
 

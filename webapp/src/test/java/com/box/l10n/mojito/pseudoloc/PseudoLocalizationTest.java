@@ -51,6 +51,21 @@ public class PseudoLocalizationTest {
   }
 
   @Test
+  public void testFixedPseudoIsDeterministic() {
+    PseudoLocalization ps = new PseudoLocalization();
+    Set<TextUnitIntegrityChecker> checkers = new HashSet<>();
+    checkers.add(new MessageFormatIntegrityChecker());
+    String input = "English Sentence with {placeholder1} and {placeholder2}";
+    String first = ps.convertStringToPseudoLoc(input, checkers, true);
+    for (int i = 0; i < 25; i++) {
+      assertEquals(
+          "Fixed pseudo localization must not vary between invocations",
+          first,
+          ps.convertStringToPseudoLoc(input, checkers, true));
+    }
+  }
+
+  @Test
   public void testConvertStringToPseudoLocWithNoIntegrityChecker() {
     PseudoLocalization ps = new PseudoLocalization();
     Set<TextUnitIntegrityChecker> checkers = new HashSet<>();

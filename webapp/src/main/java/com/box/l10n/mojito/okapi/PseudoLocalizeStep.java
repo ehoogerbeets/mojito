@@ -31,9 +31,15 @@ public class PseudoLocalizeStep extends BasePipelineStep {
   private Asset asset;
   private LocaleId targetLocale;
   private Set<TextUnitIntegrityChecker> textUnitIntegrityCheckers = new HashSet<>();
+  private final boolean fixedPseudo;
 
   public PseudoLocalizeStep(Asset asset) {
+    this(asset, false);
+  }
+
+  public PseudoLocalizeStep(Asset asset, boolean fixedPseudo) {
     this.asset = asset;
+    this.fixedPseudo = fixedPseudo;
   }
 
   @Autowired IntegrityCheckerFactory integrityCheckerFactory;
@@ -81,7 +87,8 @@ public class PseudoLocalizeStep extends BasePipelineStep {
     if (textUnit.isTranslatable()) {
       String source = textUnitUtils.getSourceAsString(textUnit);
       String pseudoTranslation =
-          pseudoLocalization.convertStringToPseudoLoc(source, textUnitIntegrityCheckers);
+          pseudoLocalization.convertStringToPseudoLoc(
+              source, textUnitIntegrityCheckers, fixedPseudo);
       textUnit.setTarget(targetLocale, new TextContainer(pseudoTranslation));
     }
 

@@ -1096,12 +1096,16 @@ public class TMService {
    * @return the pseudolocalized asset
    */
   public String generatePseudoLocalized(
-      Asset asset, String content, FilterConfigIdOverride filterConfigIdOverride)
+      Asset asset,
+      String content,
+      FilterConfigIdOverride filterConfigIdOverride,
+      boolean fixedPseudo)
       throws UnsupportedAssetFilterTypeException {
 
     String bcp47tag = "en-x-psaccent";
 
-    BasePipelineStep pseudoLocalizedStep = (BasePipelineStep) new PseudoLocalizeStep(asset);
+    BasePipelineStep pseudoLocalizedStep =
+        (BasePipelineStep) new PseudoLocalizeStep(asset, fixedPseudo);
     return generateLocalizedBase(
         asset, content, filterConfigIdOverride, null, pseudoLocalizedStep, bcp47tag);
   }

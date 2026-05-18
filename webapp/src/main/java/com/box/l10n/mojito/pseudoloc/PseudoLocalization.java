@@ -87,15 +87,27 @@ public class PseudoLocalization {
    * @return pseudo localized string
    */
   public String convertStringToPseudoLoc(String string, Set<TextUnitIntegrityChecker> checkers) {
+    return convertStringToPseudoLoc(string, checkers, false);
+  }
+
+  /**
+   * @param string string to be pseudo localized
+   * @param checkers integrity checkers for placeholder handling
+   * @param fixedPseudo when true, accent substitutions are chosen deterministically for identical
+   *     input; when false, mappings are chosen at random as in historical behavior.
+   */
+  public String convertStringToPseudoLoc(
+      String string, Set<TextUnitIntegrityChecker> checkers, boolean fixedPseudo) {
     TextUnitIntegrityChecker checker = getIntegrityCheckerForPlaceholderProcessing(checkers);
 
     if (checker == null) {
       logger.debug("There is no checker for pseudolocalization placeholder processing.");
-      return convertStringToPseudoLoc(string);
+      return convertStringToPseudoLoc(string, fixedPseudo);
     } else {
       logger.debug("Found checker for pseudolocalization placeholder processing.");
       LocalizableString localizableString = checker.extractNonLocalizableParts(string);
-      String pseudolocalized = convertStringToPseudoLoc(localizableString.getLocalizableString());
+      String pseudolocalized =
+          convertStringToPseudoLoc(localizableString.getLocalizableString(), fixedPseudo);
       localizableString.setLocalizableString(pseudolocalized);
       return checker.restoreNonLocalizableParts(localizableString);
     }
@@ -108,10 +120,14 @@ public class PseudoLocalization {
    * @return pseudo localized string
    */
   public String convertStringToPseudoLoc(String string) {
+    return convertStringToPseudoLoc(string, false);
+  }
+
+  public String convertStringToPseudoLoc(String string, boolean fixedPseudo) {
     StringBuilder sb = new StringBuilder();
 
     if (!Strings.isNullOrEmpty(string)) {
-      String str = convertAsciiToDiacritics(string);
+      String str = convertAsciiToDiacritics(string, fixedPseudo);
       sb.append(expand(str));
       sb.insert(0, '⟦');
       sb.append('⟧');
@@ -159,12 +175,16 @@ public class PseudoLocalization {
    * @return
    */
   public String convertAsciiToDiacritics(String string) {
+    return convertAsciiToDiacritics(string, false);
+  }
+
+  public String convertAsciiToDiacritics(String string, boolean fixedPseudo) {
     int stringLength = string.length();
 
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < stringLength; i++) {
       char character = string.charAt(i);
-      sb.append(getMappingCharFromMap(character));
+      sb.append(getMappingCharFromMap(character, i, fixedPseudo));
     }
 
     return sb.toString();
@@ -177,15 +197,21 @@ public class PseudoLocalization {
    * @param character ASCII character to be mapped
    * @return Non ASCII character or character itself
    */
-  private char getMappingCharFromMap(char character) {
+  private char getMappingCharFromMap(char character, int charIndex, boolean fixedPseudo) {
     char mappedChar = character;
 
     String mappingCharsForChar = pseudoLocMap.get(mappedChar);
 
     if (mappingCharsForChar != null) {
-      int maxIndex = mappingCharsForChar.length() - 1;
-      int randomIndex = (int) (Math.random() * maxIndex);
-      mappedChar = mappingCharsForChar.charAt(randomIndex);
+      int len = mappingCharsForChar.length();
+      int index;
+      if (fixedPseudo) {
+        index = Math.floorMod((int) mappedChar * 31 + charIndex * 17, len);
+      } else {
+        int maxIndex = len - 1;
+        index = (int) (Math.random() * maxIndex);
+      }
+      mappedChar = mappingCharsForChar.charAt(index);
     }
 
     return mappedChar;
